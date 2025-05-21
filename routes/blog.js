@@ -26,4 +26,36 @@ router.get('/blogs', async (req, res) => {
   }
 });
 
+// ✅ Protected: Update blog
+router.put('/blogs/:id', authMiddleware, async (req, res) => {
+  const { title, content } = req.body;
+
+  try {
+    const blog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      { title, content },
+      { new: true }
+    );
+
+    if (!blog) return res.status(404).json({ message: 'Blog not found' });
+
+    res.json(blog);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update blog' });
+  }
+});
+
+// ✅ Protected: Delete blog
+router.delete('/blogs/:id', authMiddleware, async (req, res) => {
+  try {
+    const blog = await Blog.findByIdAndDelete(req.params.id);
+
+    if (!blog) return res.status(404).json({ message: 'Blog not found' });
+
+    res.json({ message: 'Blog deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete blog' });
+  }
+});
+
 module.exports = router;
